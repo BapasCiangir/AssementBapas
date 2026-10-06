@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rekapitulasi Hasil Asesmen Pembimbing Kemasyarakatan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14233b;--ink2:#3b4a62;--brass:#9a7b3c;--paper:#f7f6f2;--card:#fff;--line:#d9d9d2;--t0:#2f6b4f;--t1:#a37a12;--t2:#b45a1b;--t3:#8f1d2c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 'Public Sans',system-ui,sans-serif}
+h1,h2,h3{font-family:'Libre Baskerville',Georgia,serif;font-weight:700;margin:0}
+header{background:var(--ink);color:#fff;border-bottom:4px solid var(--brass)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.kop{padding:22px 0 20px;display:flex;justify-content:space-between;gap:16px;align-items:flex-end;flex-wrap:wrap}
+.kop small{display:block;font-size:12px;letter-spacing:.04em;color:#c9d1de}
+.kop h1{font-size:25px;margin-top:6px}
+button,input{font:inherit}
+.btn{border:1px solid var(--ink);background:var(--ink);color:#fff;padding:8px 16px;border-radius:3px;cursor:pointer}
+.btn.alt{background:#fff;color:var(--ink)}
+.btn:hover{filter:brightness(1.15)}
+.btn:focus-visible,input:focus-visible,.tab:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+#login{max-width:440px;margin:60px auto;background:var(--card);border:1px solid var(--line);border-top:4px solid var(--brass);padding:28px}
+#login label{display:block;margin:14px 0 4px;font-weight:600}
+input[type=text],input[type=password],input[type=search]{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:3px;background:#fff}
+#err{color:var(--t3);margin-top:12px;min-height:22px}
+.tabs{display:flex;gap:4px;margin-top:26px;border-bottom:1px solid var(--line)}
+.tab{background:none;border:0;padding:11px 20px;cursor:pointer;color:var(--ink2);border-bottom:3px solid transparent;font-weight:600}
+.tab[aria-selected=true]{color:var(--ink);border-color:var(--brass)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:22px 0}
+.stat{background:var(--card);border:1px solid var(--line);padding:14px 16px}
+.stat b{display:block;font:700 28px 'Libre Baskerville',serif}
+.stat span{color:var(--ink2);font-size:13px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.tools input{flex:1;min-width:220px}
+.tbl{background:var(--card);border:1px solid var(--line);overflow-x:auto}
+table{border-collapse:collapse;width:100%}
+th,td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{background:#eceae2;font-weight:600;font-size:13px;color:var(--ink2)}
+.b{display:inline-block;padding:2px 9px;border-radius:2px;color:#fff;font-size:12.5px;font-weight:600;margin:0 6px 4px 0}
+.t0{background:var(--t0)}.t1{background:var(--t1)}.t2{background:var(--t2)}.t3{background:var(--t3)}
+.empty{padding:36px;text-align:center;color:var(--ink2)}
+dialog{border:0;padding:0;max-width:960px;width:94vw;max-height:92vh;box-shadow:0 20px 60px #0006}
+dialog::backdrop{background:#14233bcc}
+.dh{display:flex;justify-content:space-between;gap:12px;padding:16px 22px;background:var(--ink);color:#fff;position:sticky;top:0}
+.dh h2{font-size:18px}
+.db{padding:6px 22px 24px}
+.db h3{font-size:15px;margin:22px 0 8px;color:var(--ink)}
+.db td,.db th{font-size:13.5px;padding:7px 9px;border:1px solid var(--line)}
+.db tr.h td{background:#eceae2;font-weight:700}
+.db tr.f td{background:#f3f1ea;font-weight:700}
+.note{font-size:13px;color:var(--ink2);margin-top:6px}
+.hide{display:none!important}
+footer{padding:28px 0 40px;color:var(--ink2);font-size:13px}
+@media(max-width:600px){.kop h1{font-size:20px}}
+</style>
+</head>
+<body>
+<header><div class="wrap kop">
+  <div><small>DIREKTORAT JENDERAL PEMASYARAKATAN · KEMENTERIAN HUKUM DAN HAK ASASI MANUSIA REPUBLIK INDONESIA</small>
+  <h1>Rekapitulasi Hasil Asesmen</h1></div>
+  <div id="bar" class="hide"><button class="btn alt" id="out">Keluar</button></div>
+</div></header>
+
+<section id="login">
+  <h2>Masuk</h2>
+  <p style="color:var(--ink2)">Data asesmen bersifat rahasia. Masukkan kode akses untuk melihat hasil.</p>
+  <div id="urlrow"><label for="url">URL aplikasi web (Apps Script)</label><input type="text" id="url" placeholder="https://script.google.com/macros/s/.../exec"></div>
+  <label for="key">Kode akses</label><input type="password" id="key" autocomplete="current-password">
+  <p><button class="btn" id="go">Buka hasil</button></p>
+  <div id="err" role="alert"></div>
+</section>
+
+<main id="app" class="wrap hide">
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div class="stats" id="stats"></div>
+  <div class="tools">
+    <input type="search" id="q" placeholder="Cari nama narapidana atau petugas" aria-label="Cari">
+    <button class="btn alt" id="ref">Segarkan data</button>
+    <button class="btn" id="all">Unduh rekap Word</button>
+    <a class="btn alt" id="frm" target="_blank" rel="noopener" style="text-decoration:none">Buka formulir</a>
+  </div>
+  <div class="tbl"><table><thead><tr><th>No</th><th>Waktu isi</th><th>Nama narapidana</th><th>Petugas PK</th><th>Hasil</th><th>Aksi</th></tr></thead><tbody id="rows"></tbody></table><div id="none" class="empty hide">Belum ada data yang masuk.</div></div>
+</main>
+
+<dialog id="dlg"><div class="dh"><h2 id="dt"></h2><div><button class="btn alt" id="dw">Unduh Word</button> <button class="btn alt" id="dc">Tutup</button></div></div><div class="db" id="dbody"></div></dialog>
+<div class="wrap"><footer>Hasil dibaca langsung dari spreadsheet yang tertaut ke Google Form.</footer></div>
+
+<script>
+const WEB_APP_URL = ''; // opsional: isi URL /exec agar tidak perlu diketik saat masuk
+const TONES = {rri:['Rendah','Sedang','Tinggi','Sangat tinggi'], ispn:['Minimum','Medium','Maksimum','Super maksimum']};
+let DATA = {}, LINKS = {}, CUR = 'rri', OPEN = null;
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const when = s => s ? s.slice(8,10)+'-'+s.slice(5,7)+'-'+s.slice(0,4)+' '+s.slice(11,16) : '';
+const base = () => WEB_APP_URL || localStorage.getItem('pk_url') || '';
+
+async function load(){
+  const r = await fetch(base()+'?key='+encodeURIComponent(sessionStorage.getItem('pk_key')||''));
+  const j = await r.json();
+  if(!j.ok) throw new Error(j.error);
+  DATA = j.forms; LINKS = j.links || {};
+}
+async function enter(){
+  $('err').textContent = '';
+  try{
+    if(!WEB_APP_URL && $('url').value.trim()) localStorage.setItem('pk_url', $('url').value.trim());
+    if($('key').value) sessionStorage.setItem('pk_key', $('key').value);
+    if(!base()) throw new Error('URL aplikasi web belum diisi.');
+    $('go').disabled = true; await load();
+    $('login').classList.add('hide'); $('app').classList.remove('hide'); $('bar').classList.remove('hide');
+    drawTabs(); draw();
+  }catch(e){ $('err').textContent = 'Gagal memuat: '+e.message; }
+  $('go').disabled = false;
+}
+function drawTabs(){
+  $('tabs').innerHTML = Object.keys(DATA).map(k=>`<button class="tab" role="tab" data-k="${k}" aria-selected="${k===CUR}">${esc(DATA[k].tab)}</button>`).join('');
+  document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{CUR=b.dataset.k;drawTabs();draw();});
+}
+function list(){
+  const q = $('q').value.toLowerCase();
+  return (DATA[CUR]?.records||[]).filter(r=>(r.name+' '+r.officer).toLowerCase().includes(q));
+}
+function draw(){
+  const all = DATA[CUR]?.records||[], rs = list();
+  const c = [0,0,0,0]; all.forEach(r=>c[r.tone]++);
+  $('stats').innerHTML = `<div class="stat"><b>${all.length}</b><span>Total data masuk</span></div>` +
+    c.map((n,i)=>`<div class="stat"><b style="color:var(--t${i})">${n}</b><span>${TONES[CUR][i]}</span></div>`).join('');
+  $('rows').innerHTML = rs.map((r,i)=>`<tr><td>${i+1}</td><td>${when(r.ts)}</td><td><b>${esc(r.name)}</b></td><td>${esc(r.officer)}</td>
+    <td>${r.head.map(h=>`<span class="b t${h[2]}">${esc(h[0])}: ${esc(h[1])}</span>`).join('')}</td>
+    <td><button class="btn alt" data-v="${r.id}">Lihat</button> <button class="btn alt" data-w="${r.id}">Word</button></td></tr>`).join('');
+  $('none').classList.toggle('hide', rs.length>0);
+  $('frm').classList.toggle('hide', !LINKS[CUR]); $('frm').href = LINKS[CUR]||'#';
+  document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>show(b.dataset.v));
+  document.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>doc([find(b.dataset.w)], 'Asesmen_'+find(b.dataset.w).name));
+}
+const find = id => DATA[CUR].records.find(r=>r.id===id);
+
+function sec(s){
+  const cols = s.c.length;
+  const body = s.r.map(r => r.h!==undefined ? `<tr class="h"><td colspan="${cols}">${esc(r.h)}</td></tr>` : `<tr>${r.map(x=>`<td>${esc(x)}</td>`).join('')}</tr>`).join('');
+  const foot = s.f.map(f=>`<tr class="f"><td colspan="${cols-1}">${esc(f[0])}</td><td>${esc(f[1])}</td></tr>`).join('');
+  return `<h3>${esc(s.t)}</h3><table><thead><tr>${s.c.map(x=>`<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${body}${foot}</tbody></table>` +
+    (s.note ? `<p class="note"><b>Catatan PK:</b> ${esc(s.note)}</p>` : '');
+}
+function body(r){
+  return `<p><b>${esc(r.name)}</b> — diisi ${when(r.ts)} oleh ${esc(r.officer||'-')}</p>` + r.sections.map(sec).join('');
+}
+function show(id){ OPEN = find(id); $('dt').textContent = OPEN.name; $('dbody').innerHTML = body(OPEN); $('dlg').showModal(); }
+
+function doc(recs, name){
+  const title = DATA[CUR].title;
+  const pages = recs.map((r,i)=>`<div ${i?'style="page-break-before:always"':''}>
+    <p class="c">DIREKTORAT JENDERAL PEMASYARAKATAN<br>KEMENTERIAN HUKUM DAN HAK ASASI MANUSIA<br>REPUBLIK INDONESIA</p><h1>${esc(title)}</h1>
+    <p>Nama narapidana: <b>${esc(r.name)}</b><br>Petugas PK: ${esc(r.officer||'-')}<br>Waktu pengisian: ${when(r.ts)}</p>
+    ${r.sections.map(s=>(s.pb?'<br style="page-break-before:always">':'')+sec(s)).join('')}
+    <p style="margin-top:30px;margin-left:55%">Pembimbing Kemasyarakatan,<br><br><br><br><u>${esc(r.officer||'')}</u></p></div>`);
+  let html = pages.join('');
+  if(recs.length>1) html = `<p class="c">DIREKTORAT JENDERAL PEMASYARAKATAN<br>KEMENTERIAN HUKUM DAN HAK ASASI MANUSIA<br>REPUBLIK INDONESIA</p><h1>Rekapitulasi ${esc(DATA[CUR].tab)}</h1>
+    <table><tr><th>No</th><th>Waktu</th><th>Nama narapidana</th><th>Petugas PK</th><th>Hasil</th></tr>${recs.map((r,i)=>`<tr><td>${i+1}</td><td>${when(r.ts)}</td><td>${esc(r.name)}</td><td>${esc(r.officer)}</td><td>${r.head.map(h=>esc(h[0]+': '+h[1])).join('; ')}</td></tr>`).join('')}</table>
+    <br style="page-break-before:always">` + html;
+  const full = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${esc(title)}</title>
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]-->
+<style>@page{size:21cm 29.7cm;margin:2cm}body{font-family:'Times New Roman',serif;font-size:11pt}h1{font-size:13pt;text-align:center}h3{font-size:11.5pt;margin:14pt 0 4pt}
+.c{text-align:center;font-weight:bold}table{border-collapse:collapse;width:100%}td,th{border:1px solid #000;padding:3pt 5pt;font-size:10pt;vertical-align:top}th{background:#e7e6e0}tr.h td,tr.f td{font-weight:bold;background:#f0efe9}</style></head><body>${html}</body></html>`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\ufeff', full], {type:'application/msword'}));
+  a.download = name.replace(/[^\w\-]+/g,'_')+'.doc'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+$('go').onclick = enter;
+$('key').onkeydown = e => { if(e.key==='Enter') enter(); };
+$('ref').onclick = async()=>{ try{ await load(); draw(); }catch(e){ alert('Gagal memuat: '+e.message); } };
+$('all').onclick = ()=>{ const rs=list(); if(rs.length) doc(rs, 'Rekap_'+CUR); else alert('Belum ada data.'); };
+$('q').oninput = draw;
+$('dc').onclick = ()=>$('dlg').close();
+$('dw').onclick = ()=>doc([OPEN], 'Asesmen_'+OPEN.name);
+$('out').onclick = ()=>{ sessionStorage.removeItem('pk_key'); location.reload(); };
+if(WEB_APP_URL) $('urlrow').classList.add('hide'); else $('url').value = localStorage.getItem('pk_url')||'';
+</script>
+</body>
+</html>
